@@ -1,0 +1,15 @@
+[project]
+name = "revefi-dbt-python-client"
+version = "0.0.1"
+authors = [
+  { name="Alina", email="alina@revefi.com" },
+]
+description = "dbt python client to upload dbt files to Revefi"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+  "requests>=2.31.0",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/revefi/dbt_python_client"
