@@ -8,7 +8,7 @@ import tempfile
 from pathlib import Path
 
 
-API_ENDPOINT = "https://9203-73-59-115-207.ngrok.io/api/uploadFile"
+API_ENDPOINT = "https://gateway.revefi.com/api/uploadFile"
 
 
 class MakeApiCall:
@@ -21,7 +21,7 @@ class MakeApiCall:
         encoded_string = encoded_bytes.decode('utf-8')
         response = requests.post(f"{api}", data={'token': token, 'contents': encoded_string, 'hash': hash})
         if response.status_code == 200:
-            print("Upload success")
+            print("Upload successful.")
         else:
             error(f"Unable to upload. Status code - {response.status_code}")
 
@@ -58,16 +58,16 @@ class RevefiCli:
             error(f"Invalid target folder: {self.target_folder}")
 
         # check that either manifest.json or run_results.json is present
-        self.manifest_path = target_folder_path / "manifest.json"
-        self.run_results_path = target_folder_path / "run_results.json"
-        self.catalog_path = target_folder_path / "catalog.json"
+        self.manifest_path = Path(os.path.join(target_folder_path, "manifest.json"))
+        self.run_results_path = Path(os.path.join(target_folder_path,  "run_results.json"))
+        self.catalog_path = Path(os.path.join(target_folder_path,  "catalog.json"))
 
         # if log files are specified, check the log folder
         if self.logs_folder:
             logs_folder_path = Path(self.logs_folder)
             if not logs_folder_path.is_dir():
                 error(f"Invalid logs folder: {self.logs_folder}")
-            self.log_file_path = logs_folder_path / "dbt.log"
+            self.log_file_path = os.path.join(logs_folder_path, "dbt.log")
 
         if not self.manifest_path.exists() or not self.run_results_path.exists():
             raise RuntimeError(
@@ -94,7 +94,7 @@ class RevefiCli:
         temporary_path = Path(tempfile.mkdtemp())
 
         # Save the content of the project in a new file
-        project_file_path = temporary_path / project_file_name
+        project_file_path = os.path.join(temporary_path, project_file_name)
         with open(project_file_path, "w") as project_file:
             project_file.write(self._generate_project_file_contents())
 
@@ -122,16 +122,14 @@ class RevefiCli:
 
 def main():
     parser = argparse.ArgumentParser(description="revefi dbt cli")
-    parser.add_argument("--token", required=True, type=str,
-                        help="validation token")
-    parser.add_argument("--target_folder", required=True, type=str,
-                        help="target folder for the dbt run")
-    parser.add_argument("--logs_folder", required=False, type=str,
-                        help="log folder from the dbt run")
-    parser.add_argument("--project_name", required=False, type=str,
-                        help="project name (example: my-project)")
-    parser.add_argument("--endpoint", required=False, type=str,
-                        help="endpoint for API")
+    subparsers = parser.add_subparsers(dest='command')
+
+    dbt_parser = subparsers.add_parser('dbt')
+    dbt_parser.add_argument("--token", required=True, type=str, help="validation token")
+    dbt_parser.add_argument("--target_folder", required=True, type=str, help="target folder for the dbt run")
+    dbt_parser.add_argument("--logs_folder", required=False, type=str, help="log folder from the dbt run")
+    dbt_parser.add_argument("--project_name", required=False, type=str, help="project name (example: my-project)")
+    dbt_parser.add_argument("--endpoint", required=False, type=str, help="endpoint for API")
     args = parser.parse_args()
     deployer = RevefiCli(args.token, args.target_folder,
                          args.logs_folder, args.project_name, args.endpoint)
