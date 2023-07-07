@@ -14,16 +14,18 @@ API_ENDPOINT = "https://gateway.revefi.com/api/uploadFile"
 class MakeApiCall:
 
     def get_data(self, api, token, contents):
+        # Send a POST request to the Next.js backend API route
         hash = hashlib.sha256(contents).hexdigest()
         # Encode the byte array in Base64
         encoded_bytes = base64.b64encode(contents)
         # Convert the encoded bytes to a string
         encoded_string = encoded_bytes.decode('utf-8')
-        response = requests.post(f"{api}", data={'token': token, 'contents': encoded_string, 'hash': hash})
+        response = requests.post(f"{api}", data={'token': token, 'hash': hash, 'contents': encoded_string}, stream=True)
+
         if response.status_code == 200:
-            print("Upload successful.")
+            print("Upload success")
         else:
-            error(f"Unable to upload. Status code - {response.status_code}")
+            error(f"[{response.status_code}] Unable to upload - {response.text}")
 
     def __init__(self, api, token, contents):
         self.get_data(api, token, contents)
