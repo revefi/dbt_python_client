@@ -9,7 +9,7 @@ from pathlib import Path
 
 
 API_ENDPOINT = "https://gateway.revefi.com/api/uploadFile"
-
+DEFAULT_CHUNK_SIZE = 524288  # 0.5MB chunk size
 
 class MakeApiCall:
 
@@ -20,12 +20,23 @@ class MakeApiCall:
         encoded_bytes = base64.b64encode(contents)
         # Convert the encoded bytes to a string
         encoded_string = encoded_bytes.decode('utf-8')
-        response = requests.post(f"{api}", data={'token': token, 'hash': hash, 'contents': encoded_string}, stream=True)
+
+        if len(contents) > 64 * 1024 * 1024:
+            error("File size exceeds 64 MB. Please try again with a smaller file size.")
+            return
+
+        response = requests.post(f"{api}", data={'token': token, 'hash': hash, 'contents': self.chunk_data(encoded_string)})
 
         if response.status_code == 200:
-            print("Upload success")
+            print("Upload successful.")
         else:
-            error(f"[{response.status_code}] Unable to upload - {response.text}")
+            error(f"[{response.status_code}] Unable to upload - {response}")
+            return
+
+    def chunk_data(self, contents):
+        total_size = len(contents)
+        chunks = [contents[i:i + DEFAULT_CHUNK_SIZE] for i in range(0, total_size, DEFAULT_CHUNK_SIZE)]
+        yield from chunks
 
     def __init__(self, api, token, contents):
         self.get_data(api, token, contents)
