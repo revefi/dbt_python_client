@@ -11,6 +11,10 @@ from pathlib import Path
 API_ENDPOINT = "https://gateway.revefi.com/api/uploadFile"
 DEFAULT_CHUNK_SIZE = 524288  # 0.5MB chunk size
 
+# dbt related constants
+DBT_PROJECT_FILE_NAME = "dbt_project.yml"
+DBT_DEFAULT_TARGET_FOLDER_NAME = "target"
+
 class MakeApiCall:
 
     def get_data(self, api, token, contents):
@@ -47,12 +51,13 @@ def error(msg: str) -> None:
 
 
 class RevefiCli:
-    def __init__(self, token, target_folder, logs_folder, project_name, endpoint):
+    def __init__(self, token, project_folder, target_folder, logs_folder, endpoint):
         self.token = token
+        self.project_folder = project_folder
         self.target_folder = target_folder
         self.logs_folder = logs_folder
-        self.project_name = project_name if project_name is not None else 'dbt-project'
         self.endpoint = endpoint
+        self.project_file_path = None
         self.manifest_path = None
         self.run_results_path = None
         self.catalog_path = None
@@ -63,12 +68,27 @@ class RevefiCli:
         if not self.token:
             error("Missing token")
 
+        # project folder must be supplied.
+        if not self.project_folder:
+            error("Missing project folder")
+    
+        # make sure the project folder is a valid folder
+        project_folder_path = Path(self.project_folder)
+        target_folder_path = None
+
         if not self.target_folder:
-            error("Missing target folder")
+            # default to "target" within the project folder
+            self.target_folder = Path(os.path.join(project_folder_path, DBT_DEFAULT_TARGET_FOLDER_NAME))
 
         target_folder_path = Path(self.target_folder)
         if not target_folder_path.is_dir():
             error(f"Invalid target folder: {self.target_folder}")
+    
+        # check "dbt_project.yml" file is present in the project folder
+        self.project_file_path = Path(os.path.join(project_folder_path, DBT_PROJECT_FILE_NAME))
+        if not self.project_file_path.exists():
+            raise RuntimeError(
+                f"Unable to locate 'project.yaml' in the path - '{project_folder_path}'")
 
         # check that either manifest.json or run_results.json is present
         self.manifest_path = Path(os.path.join(target_folder_path, "manifest.json"))
@@ -96,23 +116,14 @@ class RevefiCli:
             contents = zip_file.read()
         return contents
 
-    def _generate_project_file_contents(self) -> str:
-        return f"name: '{self.project_name}'"
-
     def _create_zip(self) -> str:
         file_name = "compressed.zip"
-        project_file_name = "dbt_project.yml"
 
         # create random temporary file
         temporary_path = Path(tempfile.mkdtemp())
 
-        # Save the content of the project in a new file
-        project_file_path = os.path.join(temporary_path, project_file_name)
-        with open(project_file_path, "w") as project_file:
-            project_file.write(self._generate_project_file_contents())
-
         zip_file_path = os.path.join(temporary_path, file_name)
-        file_paths = [project_file_path]
+        file_paths = [self.project_file_path]
 
         if os.path.exists(self.manifest_path):
             file_paths.append(self.manifest_path)
@@ -139,13 +150,13 @@ def main():
 
     dbt_parser = subparsers.add_parser('dbt')
     dbt_parser.add_argument("--token", required=True, type=str, help="validation token")
-    dbt_parser.add_argument("--target_folder", required=True, type=str, help="target folder for the dbt run")
+    dbt_parser.add_argument("--project_folder", required=True, type=str, help="dbt project folder")
+    dbt_parser.add_argument("--target_folder", required=False, type=str, help="target folder for the dbt run")
     dbt_parser.add_argument("--logs_folder", required=False, type=str, help="log folder from the dbt run")
-    dbt_parser.add_argument("--project_name", required=False, type=str, help="project name (example: my-project)")
     dbt_parser.add_argument("--endpoint", required=False, type=str, help="endpoint for API")
     args = parser.parse_args()
-    deployer = RevefiCli(args.token, args.target_folder,
-                         args.logs_folder, args.project_name, args.endpoint)
+    deployer = RevefiCli(args.token, args.project_folder, args.target_folder,
+                         args.logs_folder, args.endpoint)
     deployer.is_valid()
     deployer.deploy()
 

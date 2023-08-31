@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name='revefi-dbt-client',
-    version='0.0.1',
+    version='0.0.2',
     author='Revefi Team',
     description='Package to upload dbt core files to Revefi',
     long_description=long_description,
