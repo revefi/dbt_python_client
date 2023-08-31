@@ -88,7 +88,7 @@ class RevefiCli:
         self.project_file_path = Path(os.path.join(project_folder_path, DBT_PROJECT_FILE_NAME))
         if not self.project_file_path.exists():
             raise RuntimeError(
-                f"Unable to locate 'project.yaml' in the path - '{project_folder_path}'")
+                f"Unable to locate '{DBT_PROJECT_FILE_NAME}' in the path - '{project_folder_path}'")
 
         # check that either manifest.json or run_results.json is present
         self.manifest_path = Path(os.path.join(target_folder_path, "manifest.json"))
