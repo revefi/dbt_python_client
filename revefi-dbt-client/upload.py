@@ -76,6 +76,11 @@ class RevefiCli:
         project_folder_path = Path(self.project_folder)
         target_folder_path = None
 
+        # check "dbt_project.yml" file is present in the project folder
+        self.project_file_path = Path(os.path.join(project_folder_path, DBT_PROJECT_FILE_NAME))
+        if not self.project_file_path.exists():
+            error(f"Unable to locate '{DBT_PROJECT_FILE_NAME}' in the path - '{project_folder_path}'")
+
         if not self.target_folder:
             # default to "target" within the project folder
             self.target_folder = Path(os.path.join(project_folder_path, DBT_DEFAULT_TARGET_FOLDER_NAME))
@@ -83,12 +88,6 @@ class RevefiCli:
         target_folder_path = Path(self.target_folder)
         if not target_folder_path.is_dir():
             error(f"Invalid target folder: {self.target_folder}")
-    
-        # check "dbt_project.yml" file is present in the project folder
-        self.project_file_path = Path(os.path.join(project_folder_path, DBT_PROJECT_FILE_NAME))
-        if not self.project_file_path.exists():
-            raise RuntimeError(
-                f"Unable to locate '{DBT_PROJECT_FILE_NAME}' in the path - '{project_folder_path}'")
 
         # check that either manifest.json or run_results.json is present
         self.manifest_path = Path(os.path.join(target_folder_path, "manifest.json"))
