@@ -32,7 +32,7 @@ jobs:
 
       - name: Install
         run: |
-          pip install git+https://github.com/revefi/dbt_python_client.git@${{ github.sha }}
+          pip3 install .
 
       - name: Test
         run: |
