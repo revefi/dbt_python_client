@@ -6,6 +6,7 @@ on:
 jobs:
   install_and_test:
     strategy:
+      fail-fast: false
       matrix:
         python_version:
           - '3.8'
@@ -15,7 +16,6 @@ jobs:
           - '3.12'
         os:
           - 'ubuntu-latest'
-          - 'windows-latest'
           - 'macos-latest'
     runs-on: ${{ matrix.os }}
     name: Install and test for ${{ matrix.python_version }} on ${{ matrix.os }}
@@ -26,7 +26,15 @@ jobs:
         with:
           python-version: ${{ matrix.python_version }}
 
+      - name: Show OS and Python version
+        run: |
+          python3 -c 'import platform; print("OS: ", platform.platform()); print("Python: ", platform.python_version())'
+
       - name: Install
         run: |
-          python3 -c 'import platform; print(f"OS: {platform.platform()}"); print(f"Python: {platform.python_version()}")'
-          pip install git+https://github.com/revefi/dbt_python_client.git
+          pip3 install .
+
+      - name: Test
+        run: |
+          pip3 install pytest==7.4.2
+          pytest --verbose

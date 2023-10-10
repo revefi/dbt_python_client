@@ -7,9 +7,9 @@ import zipfile
 import tempfile
 from pathlib import Path
 
+from config import Config
 
-API_ENDPOINT = "https://gateway.revefi.com/api/uploadFile"
-DEFAULT_CHUNK_SIZE = 524288  # 0.5MB chunk size
+
 
 # dbt related constants
 DBT_PROJECT_FILE_NAME = "dbt_project.yml"
@@ -38,8 +38,9 @@ class MakeApiCall:
             return
 
     def chunk_data(self, contents):
+        chunk_size = Config.get_chunk_size()
         total_size = len(contents)
-        chunks = [contents[i:i + DEFAULT_CHUNK_SIZE] for i in range(0, total_size, DEFAULT_CHUNK_SIZE)]
+        chunks = [contents[i:i + chunk_size] for i in range(0, total_size, chunk_size)]
         yield from chunks
 
     def __init__(self, api, token, contents):
@@ -71,7 +72,7 @@ class RevefiCli:
         # project folder must be supplied.
         if not self.project_folder:
             error("Missing project folder")
-    
+
         # make sure the project folder is a valid folder
         project_folder_path = Path(self.project_folder)
         target_folder_path = None
@@ -108,7 +109,7 @@ class RevefiCli:
     def deploy(self) -> None:
         zip_file_path = self._create_zip()
         contents = self._read_zip_contents(zip_file_path)
-        MakeApiCall(API_ENDPOINT, self.token, contents)
+        MakeApiCall(Config.get_api_endpoint(), self.token, contents)
 
     def _read_zip_contents(self, zip_file_path) -> bytes:
         with open(zip_file_path, 'rb') as zip_file:

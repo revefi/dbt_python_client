@@ -13,5 +13,5 @@ setuptools.setup(
     url='https://github.com/revefi/dbt_python_client',
     license='MIT',
     packages=['revefi-dbt-client'],
-    install_requires=['requests'],
+    install_requires=['requests', 'dynaconf==3.2.3'],
 )
