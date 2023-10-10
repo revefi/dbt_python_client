@@ -18,6 +18,7 @@ jobs:
           - windows-latest
           - macos-latest
     runs-on: ${{ matrix.os }}
+    name: Install and test for ${{ matrix.python_version }} on ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
 
@@ -27,4 +28,5 @@ jobs:
 
       - name: Install
         run: |
-          python3 -c 'import platform; print(f"OS: {platform.platform()}");print(f"Python: {platform.python_version()}")'
+          python3 -c 'import platform; print(f"OS: {platform.platform()}"); print(f"Python: {platform.python_version()}")'
+          pip install git+https://github.com/revefi/dbt_python_client.git
