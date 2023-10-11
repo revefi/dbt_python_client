@@ -18,3 +18,7 @@ class Config:
     @staticmethod
     def get_chunk_size() -> int:
         return _CONFIG.get('CHUNK_SIZE', _CHUNK_SIZE)
+
+    @staticmethod
+    def get_log_level() -> str:
+        return _CONFIG.get('LOG_LEVEL', 'INFO')
