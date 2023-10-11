@@ -1,5 +1,6 @@
 import base64
 import hashlib
+import logging
 
 import requests
 
@@ -7,6 +8,7 @@ from revefi_dbt_client.config import Config
 
 
 class MakeApiCall:
+    log = logging.getLogger(__name__)
 
     def get_data(self, api, token, contents):
         # Send a POST request to the Next.js backend API route
@@ -17,16 +19,16 @@ class MakeApiCall:
         encoded_string = encoded_bytes.decode('utf-8')
 
         if len(contents) > 64 * 1024 * 1024:
-            error("File size exceeds 64 MB. Please try again with a smaller file size.")
+            self.log.error("File size exceeds 64 MB. Please try again with a smaller file size.")
             return
 
         response = requests.post(f"{api}",
                                  data={'token': token, 'hash': hash, 'contents': self.chunk_data(encoded_string)})
 
         if response.status_code == 200:
-            print("Upload successful.")
+            self.log.info("Upload successful.")
         else:
-            error(f"[{response.status_code}] Unable to upload - {response}")
+            self.log.error(f"[{response.status_code}] Unable to upload - {response}")
             return
 
     def chunk_data(self, contents):
@@ -37,7 +39,3 @@ class MakeApiCall:
 
     def __init__(self, api, token, contents):
         self.get_data(api, token, contents)
-
-
-def error(msg: str) -> None:
-    print("[ERROR] {msg}".format(msg=msg))
