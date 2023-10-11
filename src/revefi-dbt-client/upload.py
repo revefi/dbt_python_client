@@ -1,5 +1,3 @@
-import sys
-
 from revefi_dbt_client.main import main
 
 """This python module only exists for legacy reasons.
@@ -14,4 +12,4 @@ Once all the customers migrate to the new package name, this module can be remov
 """
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()
