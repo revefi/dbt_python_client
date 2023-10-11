@@ -33,7 +33,7 @@ jobs:
       - name: Install 'revefi-dbt-client' using setup.py
         run: |
           pip3 install .
-          # Test if the module is installed and available
+          # Test if the module is installed and is available in the path
           python3 -m revefi-dbt-client.upload --help
 
       - name: Uninstall 'revefi-dbt-client'
