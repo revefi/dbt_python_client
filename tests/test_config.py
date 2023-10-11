@@ -1,4 +1,4 @@
-from upload import Config
+from revefi_dbt_client.config import Config
 
 
 def test_get_api_endpoint():
