@@ -46,7 +46,6 @@ jobs:
       - name: Run unit tests with coverage
         run: |
           pip3 install -r requirements-dev.txt
-          pip3 install coverage
           coverage run -m pytest --verbose
       - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@v3
