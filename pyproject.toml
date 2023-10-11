@@ -1,0 +1,39 @@
+[project]
+name = 'revefi-dbt-client'
+authors = ['Revefi']
+description = 'Package to upload dbt core files to Revefi'
+requires-python = '>=3.8'
+classifiers = [
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
+    'Operating System :: OS Independent',
+]
+license = 'MIT'
+dependencies = ['requests', 'dynaconf>=3.2.3']
+dynamic = ["version", "readme"]
+
+[project.urls]
+'Homepage' = 'https://github.com/revefi/dbt_python_client'
+
+[project.scripts]
+revefi-dbt-client = 'revefi_dbt_client:main'
+
+[build-system]
+requires = ['setuptools>=61.0']
+build-backend = 'setuptools.build_meta'
+
+[tool.setuptools.packages.find]
+where = ['src']
+exclude = [
+    '*.tests',
+    '*.tests.*',
+    'tests.*',
+    'tests',
+]
+
+[tool.setuptools.dynamic]
+version = { attr = 'revefi_dbt_client.__version__' }
+readme = { file = ['README.md'], content-type = 'text/markdown' }
