@@ -1,3 +1,6 @@
+[![Install and Test](https://github.com/revefi/dbt_python_client/actions/workflows/install_and_test.yaml/badge.svg)](https://codecov.io/gh/revefi/dbt_python_client)
+[![codecov](https://codecov.io/gh/revefi/dbt_python_client/graph/badge.svg?token=A6YWWOWA6L)](https://codecov.io/gh/revefi/dbt_python_client)
+
 Revefi integrates with dbt Core to help connect the dots between your data issues and your dbt models [e.g. model code changes]. 
 
 Follow the steps below to set up the integration:
