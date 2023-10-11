@@ -1,4 +1,6 @@
-from revefi_dbt_client import upload
+import sys
+
+from revefi_dbt_client.main import main
 
 """This python module only exists for legacy reasons.
 
@@ -11,10 +13,5 @@ However, this module is still in-use by the customers, thus it cannot be deleted
 Once all the customers migrate to the new package name, this module can be removed.  
 """
 
-
-def main():
-    upload.main()
-
-
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])
