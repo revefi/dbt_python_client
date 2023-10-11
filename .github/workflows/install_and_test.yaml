@@ -19,6 +19,9 @@ jobs:
           - 'macos-latest'
     runs-on: ${{ matrix.os }}
     name: Install and test for ${{ matrix.python_version }} on ${{ matrix.os }}
+    env:
+      OS: ${{ matrix.os }}
+      PYTHON_VERSION: ${{ matrix.python_version }}
     steps:
       - uses: actions/checkout@v4
 
@@ -40,7 +43,14 @@ jobs:
         run: |
           pip3 uninstall -y revefi-dbt-client
 
-      - name: Run unit tests
+      - name: Run unit tests with coverage
         run: |
           pip3 install -r requirements-dev.txt
-          pytest --verbose
+          pip3 install coverage
+          coverage run -m pytest --verbose
+      - name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          name: RevefiDbtClient
+          env_vars: OS,PYTHON_VERSION
+          flags: unittests
