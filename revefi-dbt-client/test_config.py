@@ -1,4 +1,4 @@
-from config import Config
+from upload import Config
 
 
 def test_get_api_endpoint():

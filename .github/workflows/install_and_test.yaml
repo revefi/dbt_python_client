@@ -30,11 +30,15 @@ jobs:
         run: |
           python3 -c 'import platform; print("OS: ", platform.platform()); print("Python: ", platform.python_version())'
 
-      - name: Install
+      - name: Install 'revefi-dbt-client' using setup.py
         run: |
           pip3 install .
 
-      - name: Test
+      - name: Uninstall 'revefi-dbt-client'
         run: |
-          pip3 install pytest==7.4.2
+          pip3 uninstall -y revefi-dbt-client
+
+      - name: Run unit tests
+        run: |
+          pip3 install -r requirements-dev.txt
           pytest --verbose

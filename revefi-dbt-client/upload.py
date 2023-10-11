@@ -1,19 +1,37 @@
+import argparse
 import base64
 import hashlib
-import requests
-import argparse
 import os
-import zipfile
 import tempfile
+import zipfile
 from pathlib import Path
 
-from config import Config
-
-
+import requests
+from dynaconf import Dynaconf
 
 # dbt related constants
-DBT_PROJECT_FILE_NAME = "dbt_project.yml"
-DBT_DEFAULT_TARGET_FOLDER_NAME = "target"
+_DBT_PROJECT_FILE_NAME = "dbt_project.yml"
+_DBT_DEFAULT_TARGET_FOLDER_NAME = "target"
+
+_CONFIG = Dynaconf(
+    envvar_prefix='REVEFI',
+    environments=False,
+)
+
+_API_ENDPOINT = "https://gateway.revefi.com/api/uploadFile"
+_CHUNK_SIZE = 524288  # 0.5MB chunk size
+
+
+class Config:
+
+    @staticmethod
+    def get_api_endpoint() -> str:
+        return _CONFIG.get('API_ENDPOINT', _API_ENDPOINT)
+
+    @staticmethod
+    def get_chunk_size() -> int:
+        return _CONFIG.get('CHUNK_SIZE', _CHUNK_SIZE)
+
 
 class MakeApiCall:
 
@@ -29,7 +47,8 @@ class MakeApiCall:
             error("File size exceeds 64 MB. Please try again with a smaller file size.")
             return
 
-        response = requests.post(f"{api}", data={'token': token, 'hash': hash, 'contents': self.chunk_data(encoded_string)})
+        response = requests.post(f"{api}",
+                                 data={'token': token, 'hash': hash, 'contents': self.chunk_data(encoded_string)})
 
         if response.status_code == 200:
             print("Upload successful.")
@@ -67,46 +86,52 @@ class RevefiCli:
     def is_valid(self) -> None:
         # check for valid token
         if not self.token:
-            error("Missing token")
+            raise ValueError("Missing auth token")
 
         # project folder must be supplied.
         if not self.project_folder:
-            error("Missing project folder")
+            raise ValueError("Missing project folder")
 
         # make sure the project folder is a valid folder
         project_folder_path = Path(self.project_folder)
         target_folder_path = None
 
         # check "dbt_project.yml" file is present in the project folder
-        self.project_file_path = Path(os.path.join(project_folder_path, DBT_PROJECT_FILE_NAME))
+        self.project_file_path = Path(os.path.join(project_folder_path, _DBT_PROJECT_FILE_NAME))
         if not self.project_file_path.exists():
-            error(f"Unable to locate '{DBT_PROJECT_FILE_NAME}' in the path - '{project_folder_path}'")
+            raise ValueError(f"Unable to locate '{_DBT_PROJECT_FILE_NAME}' in the path - '{project_folder_path}'")
 
+        target_folder_name = self.target_folder if self.target_folder else _DBT_DEFAULT_TARGET_FOLDER_NAME
         if not self.target_folder:
             # default to "target" within the project folder
-            self.target_folder = Path(os.path.join(project_folder_path, DBT_DEFAULT_TARGET_FOLDER_NAME))
+            self.target_folder = Path(os.path.join(project_folder_path, _DBT_DEFAULT_TARGET_FOLDER_NAME))
 
         target_folder_path = Path(self.target_folder)
+        if not target_folder_path.exists():
+            raise ValueError(f"Unable to locate '{target_folder_name}' in the path - '{project_folder_path}'")
+
         if not target_folder_path.is_dir():
-            error(f"Invalid target folder: {self.target_folder}")
+            raise ValueError(f"'{target_folder_name}' should be a dir")
 
         # check that either manifest.json or run_results.json is present
         self.manifest_path = Path(os.path.join(target_folder_path, "manifest.json"))
-        self.run_results_path = Path(os.path.join(target_folder_path,  "run_results.json"))
-        self.catalog_path = Path(os.path.join(target_folder_path,  "catalog.json"))
+        self.run_results_path = Path(os.path.join(target_folder_path, "run_results.json"))
+        self.catalog_path = Path(os.path.join(target_folder_path, "catalog.json"))
 
         # if log files are specified, check the log folder
         if self.logs_folder:
             logs_folder_path = Path(self.logs_folder)
             if not logs_folder_path.is_dir():
-                error(f"Invalid logs folder: {self.logs_folder}")
+                raise ValueError(f"Invalid logs folder: {self.logs_folder}")
             self.log_file_path = os.path.join(logs_folder_path, "dbt.log")
 
-        if not self.manifest_path.exists() or not self.run_results_path.exists():
-            raise RuntimeError(
-                f"Unable to locate 'manifest.json' or 'run_results.json' in the path - '{target_folder_path}'")
+        if not self.manifest_path.exists():
+            raise ValueError(f"Unable to locate 'manifest.json' in the path - '{target_folder_path}'")
 
-    def deploy(self) -> None:
+        if not self.run_results_path.exists():
+            raise ValueError(f"Unable to locate 'run_results.json' in the path - '{target_folder_path}'")
+
+    def upload(self) -> None:
         zip_file_path = self._create_zip()
         contents = self._read_zip_contents(zip_file_path)
         MakeApiCall(Config.get_api_endpoint(), self.token, contents)
@@ -144,6 +169,12 @@ class RevefiCli:
         return zip_file_path
 
 
+def upload(token, project_folder, target_folder=None, logs_folder=None, endpoint=None):
+    cli = RevefiCli(token, project_folder, target_folder, logs_folder, endpoint)
+    cli.is_valid()
+    cli.upload()
+
+
 def main():
     parser = argparse.ArgumentParser(description="revefi dbt cli")
     subparsers = parser.add_subparsers(dest='command')
@@ -155,10 +186,7 @@ def main():
     dbt_parser.add_argument("--logs_folder", required=False, type=str, help="log folder from the dbt run")
     dbt_parser.add_argument("--endpoint", required=False, type=str, help="endpoint for API")
     args = parser.parse_args()
-    deployer = RevefiCli(args.token, args.project_folder, args.target_folder,
-                         args.logs_folder, args.endpoint)
-    deployer.is_valid()
-    deployer.deploy()
+    upload(args.token, args.project_folder, args.target_folder, args.logs_folder, args.endpoint)
 
 
 if __name__ == "__main__":
