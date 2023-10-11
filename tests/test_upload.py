@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import pytest
 import requests
 
-import upload
+from revefi_dbt_client import upload
 
 AUTH_TOKEN = 'definitely_a_real_token'
 
