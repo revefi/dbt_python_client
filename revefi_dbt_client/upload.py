@@ -1,11 +1,12 @@
-import argparse
 import os
+import sys
 import tempfile
 import zipfile
 from pathlib import Path
 
 from revefi_dbt_client.api_helper import MakeApiCall
 from revefi_dbt_client.config import Config
+from revefi_dbt_client.parser import parse_args
 
 # dbt related constants
 _DBT_PROJECT_FILE_NAME = "dbt_project.yml"
@@ -118,16 +119,7 @@ def upload(token, project_folder, target_folder=None, logs_folder=None, endpoint
 
 
 def main():
-    parser = argparse.ArgumentParser(description="revefi dbt cli")
-    subparsers = parser.add_subparsers(dest='command')
-
-    dbt_parser = subparsers.add_parser('dbt')
-    dbt_parser.add_argument("--token", required=True, type=str, help="validation token")
-    dbt_parser.add_argument("--project_folder", required=True, type=str, help="dbt project folder")
-    dbt_parser.add_argument("--target_folder", required=False, type=str, help="target folder for the dbt run")
-    dbt_parser.add_argument("--logs_folder", required=False, type=str, help="log folder from the dbt run")
-    dbt_parser.add_argument("--endpoint", required=False, type=str, help="endpoint for API")
-    args = parser.parse_args()
+    args = parse_args(sys.argv[1:])
     upload(args.token, args.project_folder, args.target_folder, args.logs_folder, args.endpoint)
 
 
