@@ -1,19 +1,17 @@
 import os
-import sys
 import tempfile
 import zipfile
 from pathlib import Path
 
 from revefi_dbt_client.api_helper import MakeApiCall
 from revefi_dbt_client.config import Config
-from revefi_dbt_client.parser import parse_args
 
 # dbt related constants
 _DBT_PROJECT_FILE_NAME = "dbt_project.yml"
 _DBT_DEFAULT_TARGET_FOLDER_NAME = "target"
 
 
-class RevefiCli:
+class Uploader:
     def __init__(self, token, project_folder, target_folder, logs_folder, endpoint):
         self.token = token
         self.project_folder = project_folder
@@ -26,7 +24,9 @@ class RevefiCli:
         self.catalog_path = None
         self.log_file_path = None
 
-    def is_valid(self) -> None:
+        self._validate()
+
+    def _validate(self) -> None:
         # check for valid token
         if not self.token:
             raise ValueError("Missing auth token")
@@ -113,15 +113,4 @@ class RevefiCli:
 
 
 def upload(token, project_folder, target_folder=None, logs_folder=None, endpoint=None):
-    cli = RevefiCli(token, project_folder, target_folder, logs_folder, endpoint)
-    cli.is_valid()
-    cli.upload()
-
-
-def main():
-    args = parse_args(sys.argv[1:])
-    upload(args.token, args.project_folder, args.target_folder, args.logs_folder, args.endpoint)
-
-
-if __name__ == "__main__":
-    main()
+    Uploader(token, project_folder, target_folder, logs_folder, endpoint).upload()
