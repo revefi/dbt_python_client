@@ -44,8 +44,17 @@ jobs:
       - name: Install 'revefi-dbt-client' using setup.py
         run: |
           pip3 install .
+
+      - name: Run (legacy) 'revefi-dbt-client'
+        run: |
           # Test if the module is installed and is available in the path
+          # This is the legacy way of running the module
           python3 -m revefi-dbt-client.upload --help
+
+      - name: Run 'revefi-dbt-client'
+        run: |
+          # Test if the module is installed and is available in the path
+          revefi-dbt-client --help
 
       - name: Uninstall 'revefi-dbt-client'
         run: |
