@@ -39,3 +39,7 @@ exclude = [
 [tool.setuptools.dynamic]
 version = { attr = 'revefi_dbt_client.__version__' }
 readme = { file = ['README.md'], content-type = 'text/markdown' }
+
+[tool.pytest.ini_options]
+minversion = '6.0'
+pythonpath = 'src'
