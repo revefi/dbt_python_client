@@ -12,12 +12,11 @@ _DBT_DEFAULT_TARGET_FOLDER_NAME = "target"
 
 
 class Uploader:
-    def __init__(self, token, project_folder, target_folder, logs_folder, endpoint):
+    def __init__(self, token, project_folder, target_folder, logs_folder):
         self.token = token
         self.project_folder = project_folder
         self.target_folder = target_folder
         self.logs_folder = logs_folder
-        self.endpoint = endpoint
         self.project_file_path = None
         self.manifest_path = None
         self.run_results_path = None
@@ -112,5 +111,5 @@ class Uploader:
         return zip_file_path
 
 
-def upload(token, project_folder, target_folder=None, logs_folder=None, endpoint=None):
-    Uploader(token, project_folder, target_folder, logs_folder, endpoint).upload()
+def upload(token, project_folder, target_folder=None, logs_folder=None):
+    Uploader(token, project_folder, target_folder, logs_folder).upload()

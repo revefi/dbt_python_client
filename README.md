@@ -21,7 +21,7 @@ models [e.g. model code changes].
 
 - Once installed, run the following command in the terminal
   ```shell
-  revefi-dbt-client dbt --token <auth-token> --project_folder <project-folder>
+  revefi-dbt-client --token <auth-token> --project_folder <project-folder>
   ```
   where 
   - `<auth-token>` is the token you received in Step b) above
