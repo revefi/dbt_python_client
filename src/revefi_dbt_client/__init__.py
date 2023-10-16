@@ -1,4 +1,4 @@
-__version__ = '0.1.2'
+__version__ = '0.1.3'
 
 from revefi_dbt_client.config import Config
 from revefi_dbt_client.logging import configure_logging

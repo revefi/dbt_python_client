@@ -19,7 +19,14 @@ def main(legacy_parser=False):
     else:
         args = parse_args_v2(argv)
 
-    upload(args.token, args.project_folder, args.target_folder, args.logs_folder)
+    try:
+        upload(args.token, args.project_folder, args.target_folder, args.logs_folder)
+    except:
+        if args.ignore_errors:
+            LOG.exception("Error occurred, but --ignore-error is supplied, exiting with exitCode 0")
+            sys.exit(0)
+        else:
+            raise
 
 
 if __name__ == "__main__":

@@ -6,6 +6,8 @@ def _add_parser_args(parser: argparse.ArgumentParser):
     parser.add_argument("--project_folder", required=True, type=str, help="dbt project folder")
     parser.add_argument("--target_folder", required=False, type=str, help="target folder for the dbt run")
     parser.add_argument("--logs_folder", required=False, type=str, help="log folder from the dbt run")
+    parser.add_argument("--ignore-errors", required=False, action='store_true', default=False,
+                        help="when set, the client will exit with exitCode 0 even if an error occurs")
 
 
 def parse_args_legacy(argv):
