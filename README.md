@@ -27,6 +27,16 @@ models [e.g. model code changes].
   - `<auth-token>` is the token you received in Step b) above
   - `<project-folder>` is the Project folder you have created for the dbt.
 
+#### Unit test
+
+For unit testing, run the following commands
+```shell
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements-dev.txt
+pytest
+```
+
 #### Note
 
 - The uploader assumes that the dbt target path is set to `target` within the project folder. If you are using some other
