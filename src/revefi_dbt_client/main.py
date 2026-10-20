@@ -20,7 +20,8 @@ def main(legacy_parser=False):
         args = parse_args_v2(argv)
 
     try:
-        upload(args.token, args.project_folder, args.target_folder, args.logs_folder)
+        upload(args.token, args.project_folder, args.target_folder, args.logs_folder, args.max_retries,
+               args.max_retry_wait_seconds)
     except:
         if args.ignore_errors:
             LOG.exception("Error occurred, but --ignore-error is supplied, exiting with exitCode 0")

@@ -1,22 +1,31 @@
+import logging
 import os
 import tempfile
 import zipfile
 from pathlib import Path
 
-from revefi_dbt_client.api_helper import MakeApiCall
+from tenacity import Retrying, before_sleep_log, retry_if_exception, stop_after_attempt, stop_after_delay, \
+    wait_exponential_jitter
+
+from revefi_dbt_client.api_helper import MakeApiCall, is_retryable_http_status_code
 from revefi_dbt_client.config import Config
 
 # dbt related constants
 _DBT_PROJECT_FILE_NAME = "dbt_project.yml"
 _DBT_DEFAULT_TARGET_FOLDER_NAME = "target"
 
+LOG = logging.getLogger(__name__)
+
 
 class Uploader:
-    def __init__(self, token, project_folder, target_folder, logs_folder):
+    def __init__(self, token, project_folder, target_folder, logs_folder, max_retries: int,
+                 max_retry_wait_seconds: int):
         self.token = token
         self.project_folder = project_folder
         self.target_folder = target_folder
         self.logs_folder = logs_folder
+        self.max_retries = max_retries
+        self.max_retry_wait_seconds = max_retry_wait_seconds
         self.project_file_path = None
         self.manifest_path = None
         self.run_results_path = None
@@ -76,7 +85,19 @@ class Uploader:
     def upload(self) -> None:
         zip_file_path = self._create_zip()
         contents = self._read_zip_contents(zip_file_path)
-        MakeApiCall(Config.get_api_endpoint(), self.token, contents)
+        self._retrying()(MakeApiCall, Config.get_api_endpoint(), self.token, contents)
+
+    def _retrying(self) -> Retrying:
+        return Retrying(
+            retry=retry_if_exception(is_retryable_http_status_code),
+            stop=stop_after_attempt(self.max_retries + 1) | stop_after_delay(self.max_retry_wait_seconds),
+            # exponential backoff plus a random jitter in [0, max jitter] to avoid synchronized retries
+            wait=wait_exponential_jitter(multiplier=Config.get_retry_backoff_min_seconds(),
+                                         max=Config.get_retry_backoff_max_seconds(),
+                                         jitter=Config.get_retry_max_jitter_seconds()),
+            before_sleep=before_sleep_log(LOG, logging.WARNING),
+            reraise=True,
+        )
 
     def _read_zip_contents(self, zip_file_path) -> bytes:
         with open(zip_file_path, 'rb') as zip_file:
@@ -111,5 +132,10 @@ class Uploader:
         return zip_file_path
 
 
-def upload(token, project_folder, target_folder=None, logs_folder=None):
-    Uploader(token, project_folder, target_folder, logs_folder).upload()
+def upload(token, project_folder, target_folder=None, logs_folder=None, max_retries=None,
+           max_retry_wait_seconds=None):
+    if max_retries is None:
+        max_retries = Config.get_max_retries()
+    if max_retry_wait_seconds is None:
+        max_retry_wait_seconds = Config.get_max_retry_wait_seconds()
+    Uploader(token, project_folder, target_folder, logs_folder, max_retries, max_retry_wait_seconds).upload()
