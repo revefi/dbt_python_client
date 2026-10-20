@@ -8,7 +8,7 @@ Revefi integrates with dbt Core to help connect the dots between your data issue
 models [e.g. model code changes].
 
 ### Pre-requisites
-- Python 3.9 or higher
+- Python 3.11 to 3.16
 
 ### Set up the integration:
 

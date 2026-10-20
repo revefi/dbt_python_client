@@ -1,5 +1,5 @@
 [build-system]
-requires = ['setuptools~=82.0.1']
+requires = ['setuptools~=84.2.1']
 build-backend = 'setuptools.build_meta'
 
 [project]
@@ -8,16 +8,18 @@ authors = [
     { name = 'Revefi' },
 ]
 description = 'Package to upload dbt core files to Revefi'
-requires-python = '>=3.9'
+requires-python = '>=3.11,<3.17'
 classifiers = [
-    'Programming Language :: Python :: 3.9',
-    'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
     'Programming Language :: Python :: 3.12',
+    'Programming Language :: Python :: 3.13',
+    'Programming Language :: Python :: 3.14',
+    'Programming Language :: Python :: 3.15',
+    'Programming Language :: Python :: 3.16',
     'Operating System :: OS Independent',
 ]
 license = { file = 'LICENSE' }
-dependencies = ['requests', 'dynaconf~=3.3.0']
+dependencies = ['requests~=2.34.2', 'dynaconf~=3.3.5']
 dynamic = ["version", "readme"]
 
 [project.urls]

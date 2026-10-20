@@ -1,5 +1,5 @@
-setuptools~=82.0.1
-requests
-dynaconf~=3.3.0
-pytest
-coverage
+setuptools~=84.2.1
+requests~=2.34.2
+dynaconf~=3.3.5
+pytest~=9.1.1
+coverage~=7.16.2

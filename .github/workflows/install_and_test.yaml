@@ -18,10 +18,12 @@ jobs:
       fail-fast: false
       matrix:
         python_version:
-          - '3.9'
-          - '3.10'
           - '3.11'
           - '3.12'
+          - '3.13'
+          - '3.14'
+          - '3.15'
+          - '3.16'
         os:
           - 'ubuntu-latest'
           - 'macos-latest'
@@ -35,6 +37,8 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python_version }}
+          # Python 3.16 is still in pre-release; allow alpha/beta/rc builds
+          allow-prereleases: true
 
       - name: Show OS and Python version
         run: |
