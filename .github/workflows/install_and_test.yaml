@@ -30,9 +30,9 @@ jobs:
       OS: ${{ matrix.os }}
       PYTHON_VERSION: ${{ matrix.python_version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python_version }}
 
@@ -75,7 +75,7 @@ jobs:
           coverage run -m pytest --verbose
 
       - name: Upload Coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v7
         with:
           name: RevefiDbtClient
           env_vars: OS,PYTHON_VERSION
