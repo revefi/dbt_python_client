@@ -17,7 +17,7 @@ classifiers = [
     'Operating System :: OS Independent',
 ]
 license = { file = 'LICENSE' }
-dependencies = ['requests', 'dynaconf~=3.3.5']
+dependencies = ['requests', 'dynaconf~=3.3.0']
 dynamic = ["version", "readme"]
 
 [project.urls]
