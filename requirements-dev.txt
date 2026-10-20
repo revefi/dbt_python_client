@@ -1,5 +1,5 @@
 setuptools==70.0.0
 requests
-dynaconf==3.2.3
+dynaconf==3.2.13
 pytest
 coverage
