@@ -8,7 +8,7 @@ def test_parse_args_legacy():
     assert args.project_folder == '/path/to/project/dir'
     assert args.target_folder is None
     assert args.logs_folder is None
-    assert args.ignore_errors is False
+    assert args.ignore_errors is True
 
     argv = 'dbt --token definitely-a-real-token --project_folder /path/to/project/dir --target_folder custom_target_dir --logs_folder /path/to/logs/dir --ignore-error'.split(
         ' ')
@@ -19,6 +19,15 @@ def test_parse_args_legacy():
     assert args.logs_folder == '/path/to/logs/dir'
     assert args.ignore_errors is True
 
+    argv = 'dbt --token definitely-a-real-token --project_folder /path/to/project/dir --target_folder custom_target_dir --logs_folder /path/to/logs/dir --no-ignore-error'.split(
+        ' ')
+    args = parse_args_legacy(argv)
+    assert args.token == 'definitely-a-real-token'
+    assert args.project_folder == '/path/to/project/dir'
+    assert args.target_folder == 'custom_target_dir'
+    assert args.logs_folder == '/path/to/logs/dir'
+    assert args.ignore_errors is False
+
 
 def test_parse_args_v2():
     argv = '--token definitely-a-real-token --project_folder /path/to/project/dir'.split(' ')
@@ -27,7 +36,7 @@ def test_parse_args_v2():
     assert args.project_folder == '/path/to/project/dir'
     assert args.target_folder is None
     assert args.logs_folder is None
-    assert args.ignore_errors is False
+    assert args.ignore_errors is True
 
     argv = '--token definitely-a-real-token --project_folder /path/to/project/dir --target_folder custom_target_dir --logs_folder /path/to/logs/dir --ignore-error'.split(
         ' ')
@@ -37,3 +46,12 @@ def test_parse_args_v2():
     assert args.target_folder == 'custom_target_dir'
     assert args.logs_folder == '/path/to/logs/dir'
     assert args.ignore_errors is True
+
+    argv = '--token definitely-a-real-token --project_folder /path/to/project/dir --target_folder custom_target_dir --logs_folder /path/to/logs/dir --no-ignore-error'.split(
+        ' ')
+    args = parse_args_v2(argv)
+    assert args.token == 'definitely-a-real-token'
+    assert args.project_folder == '/path/to/project/dir'
+    assert args.target_folder == 'custom_target_dir'
+    assert args.logs_folder == '/path/to/logs/dir'
+    assert args.ignore_errors is False
