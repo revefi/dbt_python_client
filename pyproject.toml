@@ -8,9 +8,8 @@ authors = [
     { name = 'Revefi' },
 ]
 description = 'Package to upload dbt core files to Revefi'
-requires-python = '>=3.8'
+requires-python = '>=3.9'
 classifiers = [
-    'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
