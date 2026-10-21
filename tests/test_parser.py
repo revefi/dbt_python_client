@@ -9,6 +9,8 @@ def test_parse_args_legacy():
     assert args.target_folder is None
     assert args.logs_folder is None
     assert args.ignore_errors is True
+    assert args.max_retries == 30
+    assert args.max_retry_wait_seconds == 600
 
     argv = 'dbt --token definitely-a-real-token --project_folder /path/to/project/dir --target_folder custom_target_dir --logs_folder /path/to/logs/dir --ignore-error'.split(
         ' ')
@@ -37,6 +39,8 @@ def test_parse_args_v2():
     assert args.target_folder is None
     assert args.logs_folder is None
     assert args.ignore_errors is True
+    assert args.max_retries == 30
+    assert args.max_retry_wait_seconds == 600
 
     argv = '--token definitely-a-real-token --project_folder /path/to/project/dir --target_folder custom_target_dir --logs_folder /path/to/logs/dir --ignore-error'.split(
         ' ')
@@ -55,3 +59,10 @@ def test_parse_args_v2():
     assert args.target_folder == 'custom_target_dir'
     assert args.logs_folder == '/path/to/logs/dir'
     assert args.ignore_errors is False
+
+
+def test_parse_args_retry_options():
+    argv = '--token t --project_folder /p --max-retries 2 --max-retry-wait-seconds 60'.split(' ')
+    args = parse_args_v2(argv)
+    assert args.max_retries == 2
+    assert args.max_retry_wait_seconds == 60

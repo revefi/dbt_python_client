@@ -4,6 +4,25 @@ import logging
 
 import requests
 
+from revefi_dbt_client.config import Config
+
+
+class ApiError(Exception):
+    def __init__(self, *args, status_code: int):
+        super().__init__(*args)
+        self.status_code = status_code
+
+
+def is_retryable_http_status_code(exception: BaseException) -> bool:
+    # ValueError signals a non-transient problem (e.g. file too large), so don't retry it
+    if isinstance(exception, ValueError):
+        return False
+    # only retry API errors that are transient (e.g. rate limiting or the server being unavailable)
+    if isinstance(exception, ApiError):
+        return exception.status_code in Config.get_retryable_status_codes()
+    # network errors (connection refused, timeouts, ...) and anything else unexpected are retried
+    return True
+
 
 class MakeApiCall:
     log = logging.getLogger(__name__)
@@ -23,9 +42,9 @@ class MakeApiCall:
                                  json={'token': token, 'hash': hash, 'contents': [encoded_string]})
 
         if response.status_code != 200:
-            raise Exception("Error uploading file", {
+            raise ApiError("Error uploading file", {
                 'error': response.text
-            })
+            }, status_code=response.status_code)
 
         self.log.info("Upload successful: {}".format(response.text))
 
