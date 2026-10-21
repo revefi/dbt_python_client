@@ -1,5 +1,0 @@
-setuptools~=82.0.1
-requests
-dynaconf~=3.3.0
-pytest
-coverage
