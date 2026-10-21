@@ -9,7 +9,7 @@ models [e.g. model code changes].
 
 ### Pre-requisites
 
-- Python 3.11 to 3.16
+- Python 3.11 to 3.15
 
 ### Set up the integration:
 
