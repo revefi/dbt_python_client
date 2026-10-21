@@ -8,11 +8,13 @@ Revefi integrates with dbt Core to help connect the dots between your data issue
 models [e.g. model code changes].
 
 ### Pre-requisites
+
 - Python 3.11 to 3.16
 
 ### Set up the integration:
 
-- Run the following command to install the revefi-dbt-client package
+- Run the following command to install the `revefi-dbt-client` package:
+
   ```shell
   pip install git+https://github.com/revefi/dbt_python_client.git
   ```
@@ -29,12 +31,11 @@ models [e.g. model code changes].
 
 #### Unit test
 
-For unit testing, run the following commands
+Contributors need [uv](https://docs.astral.sh/uv/getting-started/installation/). For unit testing, run:
+
 ```shell
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements-dev.txt
-pytest
+uv sync --locked
+uv run pytest
 ```
 
 #### Note

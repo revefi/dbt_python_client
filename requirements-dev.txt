@@ -1,6 +1,0 @@
-setuptools~=84.2.1
-requests~=2.34.2
-dynaconf~=3.2.13
-tenacity~=9.2.1
-pytest~=9.1.1
-coverage~=7.16.2
