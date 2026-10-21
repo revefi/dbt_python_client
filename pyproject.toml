@@ -1,46 +1,54 @@
 [build-system]
-requires = ['setuptools~=84.2.1']
-build-backend = 'setuptools.build_meta'
+requires = ["setuptools>=84.2.1,<85"]
+build-backend = "setuptools.build_meta"
 
 [project]
-name = 'revefi-dbt-client'
+name = "revefi-dbt-client"
+version = "0.2.0"
 authors = [
-    { name = 'Revefi' },
+    { name = "Revefi" },
 ]
-description = 'Package to upload dbt core files to Revefi'
-requires-python = '>=3.11,<3.17'
+description = "Package to upload dbt core files to Revefi"
+readme = "README.md"
+requires-python = ">=3.11,<3.17"
 classifiers = [
-    'Programming Language :: Python :: 3.11',
-    'Programming Language :: Python :: 3.12',
-    'Programming Language :: Python :: 3.13',
-    'Programming Language :: Python :: 3.14',
-    'Programming Language :: Python :: 3.15',
-    'Programming Language :: Python :: 3.16',
-    'Operating System :: OS Independent',
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
+    "Programming Language :: Python :: 3.16",
+    "Operating System :: OS Independent",
 ]
-license = { file = 'LICENSE' }
-dependencies = ['requests~=2.34.2', 'dynaconf~=3.2.13', 'tenacity~=9.2.1']
-dynamic = ["version", "readme"]
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies = [
+    "dynaconf~=3.2.13",
+    "requests~=2.34.2",
+    "tenacity~=9.2.1",
+]
+
+[dependency-groups]
+dev = [
+    "coverage~=7.16.2",
+    "pytest~=9.1.1",
+]
 
 [project.urls]
-'Homepage' = 'https://github.com/revefi/dbt_python_client'
+Homepage = "https://github.com/revefi/dbt_python_client"
 
 [project.scripts]
-revefi-dbt-client = 'revefi_dbt_client.main:main'
+revefi-dbt-client = "revefi_dbt_client.main:main"
 
 [tool.setuptools.packages.find]
-where = ['src']
+where = ["src"]
 exclude = [
-    '*.tests',
-    '*.tests.*',
-    'tests.*',
-    'tests',
+    "*.tests",
+    "*.tests.*",
+    "tests.*",
+    "tests",
 ]
 
-[tool.setuptools.dynamic]
-version = { attr = 'revefi_dbt_client.__version__' }
-readme = { file = ['README.md'], content-type = 'text/markdown' }
-
 [tool.pytest.ini_options]
-minversion = '6.0'
-pythonpath = 'src'
+minversion = "9.0"
+pythonpath = "src"

@@ -34,49 +34,60 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Set up uv and Python ${{ matrix.python_version }}
-        uses: astral-sh/setup-uv@v10
+      - name: Set up Python ${{ matrix.python_version }}
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python_version }}
-          activate-environment: true
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10
+        with:
+          version: '0.13.0'
+          python-version: ${{ matrix.python_version }}
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: Install from the checked-out source with pip
+        run: python -m pip install .
+
+      - name: Verify the pip installation
+        run: |
+          python -m pip show revefi-dbt-client
+          revefi-dbt-client --help
+
+      - name: Uninstall the package with pip
+        run: python -m pip uninstall --yes revefi-dbt-client
+
+      - name: Sync the locked environment
+        run: uv sync --locked
 
       - name: Show OS and Python version
         run: |
-          python3 -c 'import platform; print("OS: ", platform.platform()); print("Python: ", platform.python_version())'
-
-      - name: Install 'revefi-dbt-client'
-        run: |
-          uv pip install .
+          uv run --locked --no-sync python -c 'import platform; print("OS: ", platform.platform()); print("Python: ", platform.python_version())'
 
       - name: Run (legacy) 'revefi-dbt-client'
         run: |
           # Test if the module is installed and is available in the path
           # This is the legacy way of running the module
-          python3 -m revefi-dbt-client.upload --help
+          uv run --locked --no-sync python -m revefi-dbt-client.upload --help
 
       - name: Run 'revefi-dbt-client'
         run: |
           # Test if the module is installed and is available in the path
-          revefi-dbt-client --help
+          uv run --locked --no-sync revefi-dbt-client --help
 
       - name: Test setting '--ignore-error' results in exit code 0
         run: |
           # This shall fail, however, --ignore-error is set and the command shall exit with 0 
-          revefi-dbt-client \
+          uv run --locked --no-sync revefi-dbt-client \
             --token definitely-a-real-token \
             --project_folder /path/to/project/dir \
             --target_folder custom_target_dir \
             --logs_folder /path/to/logs/dir \
             --ignore-error
 
-      - name: Uninstall 'revefi-dbt-client'
-        run: |
-          uv pip uninstall revefi-dbt-client
-
       - name: Run unit tests with coverage
-        run: |
-          uv pip install -r requirements-dev.txt
-          coverage run -m pytest --verbose
+        run: uv run --locked --no-sync coverage run -m pytest --verbose
 
       - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@v7
@@ -84,3 +95,7 @@ jobs:
           name: RevefiDbtClient
           env_vars: OS,PYTHON_VERSION
           flags: unittests
+
+      - name: Minimize uv cache
+        if: always()
+        run: uv cache prune --ci
