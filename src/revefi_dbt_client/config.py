@@ -5,7 +5,7 @@ _CONFIG = Dynaconf(
     environments=False,
 )
 
-_API_ENDPOINT = "https://gateway.revefi.com/api/uploadFile"
+_API_ENDPOINT = "https://gateway.revefi.com/api/v1/dbt/upload"
 _MAX_RETRIES = 30
 _MAX_RETRY_WAIT_SECONDS = 10 * 60
 _IGNORE_ERRORS = True
