@@ -5,7 +5,7 @@ from revefi_dbt_client.config import Config
 
 
 def test_get_api_endpoint():
-    assert Config.get_api_endpoint() == "https://gateway.revefi.com/api/uploadFile"
+    assert Config.get_api_endpoint() == "https://gateway.revefi.com/api/v1/dbt/upload"
 
 
 def test_get_max_retries():
