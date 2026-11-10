@@ -11,13 +11,20 @@ models [e.g. model code changes].
 
 - Python 3.9
 
+> [!NOTE]
+> Python 3.9 is supported only on the `main-python-3-9` branch. For Python 3.10 and newer, install from the
+> [`main`](https://github.com/revefi/dbt_python_client/tree/main) branch instead.
+
 ### Set up the integration:
 
-- Run the following command to install the `revefi-dbt-client` package:
+- Run the following command with your Python 3.9 interpreter to install the `revefi-dbt-client` package from the
+  `main-python-3-9` branch:
 
   ```shell
-  pip install git+https://github.com/revefi/dbt_python_client.git
+  python3.9 -m pip install "git+https://github.com/revefi/dbt_python_client.git@main-python-3-9"
   ```
+
+  The `@main-python-3-9` suffix is required: without it, pip installs from `main`, which does not support Python 3.9.
 
 - Separately, you will have received a Revefi Auth token; keep that in a secure place (like your password manager)
 
@@ -31,9 +38,12 @@ models [e.g. model code changes].
 
 #### Unit test
 
-Contributors need [uv](https://docs.astral.sh/uv/getting-started/installation/). For unit testing, run:
+Contributors need [uv](https://docs.astral.sh/uv/getting-started/installation/). Check out the `main-python-3-9`
+branch, then run the unit tests:
 
 ```shell
+git clone --branch main-python-3-9 https://github.com/revefi/dbt_python_client.git
+cd dbt_python_client
 uv sync --locked
 uv run pytest
 ```
