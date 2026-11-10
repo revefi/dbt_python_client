@@ -183,7 +183,7 @@ wheels = [
 
 [[package]]
 name = "revefi-dbt-client"
-version = "0.2.0"
+version = "0.2.0+python.3.9"
 source = { editable = "." }
 dependencies = [
     { name = "dynaconf" },
