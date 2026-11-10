@@ -92,9 +92,9 @@ class Uploader:
             retry=retry_if_exception(is_retryable_http_status_code),
             stop=stop_after_attempt(self.max_retries + 1) | stop_after_delay(self.max_retry_wait_seconds),
             # exponential backoff plus a random jitter in [0, max jitter] to avoid synchronized retries
-            wait=wait_exponential_jitter(multiplier=Config.get_retry_backoff_min_seconds(),
-                                         max=Config.get_retry_backoff_max_seconds(),
-                                         jitter=Config.get_retry_max_jitter_seconds()),
+            wait=wait_exponential_jitter(initial=Config.get_retry_backoff_min_seconds(),
+                                      max=Config.get_retry_backoff_max_seconds(),
+                                      jitter=Config.get_retry_max_jitter_seconds()),
             before_sleep=before_sleep_log(LOG, logging.WARNING),
             reraise=True,
         )

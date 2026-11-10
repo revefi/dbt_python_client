@@ -9,14 +9,14 @@ models [e.g. model code changes].
 
 ### Pre-requisites
 
-- Python 3.10 to 3.15
+- Python 3.9
 
 ### Set up the integration:
 
 - Run the following command to install the `revefi-dbt-client` package:
 
   ```shell
-  pip install git+https://github.com/revefi/dbt_python_client.git
+  pip install git+https://github.com/revefi/dbt_python_client.git@main-python-3-9
   ```
 
 - Separately, you will have received a Revefi Auth token; keep that in a secure place (like your password manager)
